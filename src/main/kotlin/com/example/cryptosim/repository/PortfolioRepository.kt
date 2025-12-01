@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface PortfolioRepository: JpaRepository<Portfolio, Long> {
     fun findByUser(user: UserAccount, pageable: Pageable): Page<Portfolio>
+    fun findByUserId(userId: Long): Portfolio
 }

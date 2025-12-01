@@ -35,15 +35,11 @@ class PortfolioHoldingService(
         return holdingRepo.save(holding).toResponse()
     }
 
-    fun getHoldings(portfolioId: Long, pageable: Pageable, userEmail: String): Page<PortfolioHoldingResponse> {
-        val portfolio = portfolioRepo.findByIdOrNull(portfolioId)
-            ?: throw IdNotFoundException(portfolioId)
-
-        if(portfolio.user.email != userEmail && portfolio.user.role != Role.ADMIN){
-            throw UnauthorizedException("view holdings", portfolioId)
-        }
-
-        return holdingRepo.findByPortfolioId(portfolioId, pageable)
+    fun getUserPortfolioHoldings(portfolioId: Long, userId: Long): List<PortfolioHoldingResponse> {
+        return holdingRepo
+            .findByPortfolioIdAndPortfolioUserId(portfolioId, userId)
             .map { it.toResponse() }
     }
+
+
 }

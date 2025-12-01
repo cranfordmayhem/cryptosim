@@ -63,6 +63,9 @@ class UserProfileService(
             }
         } ?: throw IdNotFoundException(id)
 
+    fun getUserData(id: Long): UserProfileResponse =
+        userProfileRepo.findByUserId(id).toResponse()
+
     fun delete(id: Long, userEmail: String): Unit? =
         userProfileRepo.findByIdOrNull(id)?.apply {
             logger.debug("Deleting profile")

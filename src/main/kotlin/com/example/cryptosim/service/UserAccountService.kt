@@ -67,4 +67,11 @@ class UserAccountService(
             logger.debug("Retrieving specific user")
         }?.toResponse()?.also { logger.info("user details retrieved successfully") }
             ?: throw IdNotFoundException(id)
+
+    fun retrieveByEmail(email: String): UserAccountResponse {
+        val user = userAccountRepo.findByEmail(email)
+            ?: throw RuntimeException("User not found")
+
+        return user.toResponse()
+    }
 }

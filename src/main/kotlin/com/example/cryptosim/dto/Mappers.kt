@@ -1,6 +1,7 @@
 package com.example.cryptosim.dto
 
 import com.example.cryptosim.entity.*
+import java.math.BigDecimal
 import java.time.Instant
 
 fun RefreshTokenRequest.toEntity(userAccount: UserAccount, expiryDate: Instant): RefreshToken = RefreshToken(
@@ -69,4 +70,12 @@ fun PortfolioHolding.toResponse(): PortfolioHoldingResponse = PortfolioHoldingRe
     id = this.id,
     assetId = this.asset.id,
     amount = this.amount
+)
+
+fun PortfolioHolding.toPricedResponse(price: BigDecimal, totalValue: BigDecimal): PricedHoldingResponse = PricedHoldingResponse(
+    id = this.id,
+    assetId = this.asset.id,
+    amount = this.amount,
+    price = price,
+    totalValue = totalValue
 )

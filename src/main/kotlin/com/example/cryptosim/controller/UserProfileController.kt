@@ -49,4 +49,8 @@ class UserProfileController(
             ?: throw RuntimeException("NO ACCOUNT FOUND")
         return userProfileService.delete(id, email)
     }
+
+    @GetMapping("/me/{id}")
+    fun getUserData(@PathVariable id: Long) =
+        userProfileService.getUserData(id)
 }

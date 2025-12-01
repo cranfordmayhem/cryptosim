@@ -9,10 +9,13 @@ import org.springframework.data.domain.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 
 @Service
 class PortfolioService(
     private val portfolioRepo: PortfolioRepository,
+    private val portfolioHoldingRepo: PortfolioHoldingRepository,
+    private val priceHistoryRepo: CryptoPriceHistoryRepository,
     private val userAccountRepo: UserAccountRepository
 ) {
     private val logger = LoggerFactory.getLogger(PortfolioService::class.java)
@@ -79,4 +82,25 @@ class PortfolioService(
                 throw UnauthorizedException("delete", id)
         }?.let { portfolioRepo.deleteById(id) }?.also { logger.info("Portfolio deleted successfully") }
             ?: throw IdNotFoundException(id)
+
+    fun getUserPortfolio(userId: Long): List<PricedHoldingResponse> {
+        val holdings = portfolioHoldingRepo.findByPortfolioUserId(userId)
+        val latestPrices = priceHistoryRepo.findLatestPerAsset()
+            .associate { it.asset.id to it.priceUsd }
+
+        return holdings.map { h ->
+            val price = latestPrices[h.asset.id] ?: BigDecimal.ZERO
+            PricedHoldingResponse(
+                id = h.id,
+                assetId = h.asset.id,
+                amount = h.amount,
+                price = price,
+                totalValue = h.amount.multiply(price)
+            )
+        }
+    }
+
+    fun getPortfolioData(id: Long): PortfolioResponse =
+        portfolioRepo.findByUserId(id).toResponse()
+
 }

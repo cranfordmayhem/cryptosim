@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.validation.annotation.Validated
 
 @Validated
@@ -38,4 +39,12 @@ class AuthController(private val authService: AuthenticationService, private val
     @PutMapping("/{id}")
     fun update(@PathVariable id: Long, @Valid @RequestBody user: UserAccountRequest) =
         userAccService.update(id, user)
+
+    @GetMapping("/me")
+    fun getCurrentUser(): UserAccountResponse {
+        val email = SecurityContextHolder.getContext().authentication.name
+            ?: throw RuntimeException("NO ACCOUNT FOUND")
+
+        return userAccService.retrieveByEmail(email)
+    }
 }

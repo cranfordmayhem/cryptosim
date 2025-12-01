@@ -3,6 +3,9 @@ package com.example.cryptosim.controller
 import com.example.cryptosim.dto.PortfolioHoldingRequest
 import com.example.cryptosim.dto.PortfolioHoldingResponse
 import com.example.cryptosim.entity.PortfolioHolding
+import com.example.cryptosim.exception.IdNotFoundException
+import com.example.cryptosim.exception.UserNotFoundException
+import com.example.cryptosim.repository.UserAccountRepository
 import com.example.cryptosim.service.PortfolioHoldingService
 import org.springframework.data.domain.Page
 import org.springframework.hateoas.PagedModel
@@ -16,7 +19,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/portfolios/{portfolioId}/holdings")
 class PortfolioHoldingController(
     private val service: PortfolioHoldingService,
-    private val assembler: PagedResourcesAssembler<PortfolioHolding>
+    private val userAccRepo: UserAccountRepository,
+    private val assembler: PagedResourcesAssembler<PortfolioHoldingResponse>
 ) {
     @PostMapping
     fun addHolding(
@@ -28,15 +32,11 @@ class PortfolioHoldingController(
     }
 
     @GetMapping
-    fun getHoldings(
-        @PathVariable portfolioId: Long,
-        pageable: Pageable,
-        assembler: PagedResourcesAssembler<PortfolioHoldingResponse>
-    ): PagedModel<EntityModel<PortfolioHoldingResponse>> {
+    fun getHoldings(@PathVariable portfolioId: Long): List<PortfolioHoldingResponse> {
         val email = SecurityContextHolder.getContext().authentication.name
-        val page = service.getHoldings(portfolioId, pageable, email)
-        return assembler.toModel(page) { holdingResponse ->
-            EntityModel.of(holdingResponse)
-        }
+        val userId = userAccRepo.findByEmail(email)?.id
+        return service.getUserPortfolioHoldings(portfolioId, userId!!)
     }
+
+
 }

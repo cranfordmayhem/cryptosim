@@ -48,4 +48,12 @@ class PortfolioController(
             ?: throw RuntimeException("NO ACCOUNT FOUND")
         return portfolioService.delete(id, email)
     }
+
+    @GetMapping("/{userId}/holdings")
+    fun getUserPortfolio(@PathVariable userId: Long) =
+        portfolioService.getUserPortfolio(userId)
+
+    @GetMapping("/me/{id}")
+    fun getUserData(@PathVariable id: Long) =
+        portfolioService.getPortfolioData(id)
 }

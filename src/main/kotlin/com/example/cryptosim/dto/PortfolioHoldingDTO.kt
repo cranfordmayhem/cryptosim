@@ -12,3 +12,16 @@ data class PortfolioHoldingResponse(
     val assetId: String,
     val amount: BigDecimal
 )
+
+data class PricedHoldingRequest(
+    val assetId: String,
+    val amount: BigDecimal
+)
+
+data class PricedHoldingResponse(
+    val id: Long,
+    val assetId: String,
+    val amount: BigDecimal,
+    val price: BigDecimal,
+    val totalValue: BigDecimal
+)
